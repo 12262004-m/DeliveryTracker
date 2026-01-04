@@ -1,0 +1,95 @@
+{{template "top" .}}
+<title> New order</title>
+</head>
+<body class="bg-gray-200 min-h-screen">
+<div class="flex items-center justify-center p-6 md:p-8">
+    <div class="bg-white/80 backdrop-blur-sm p-8 md:p-10 rounded-3xl shadow-xl border border-white max-w-2xl w-full">
+        <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center tracking-light"> New order </h1>
+        <form action="/new-order" method="POST" class="space-y-6">
+            <div class="space-y-5">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4"> Customer information </h2>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-2" for="name">Name</label>
+                    <input type="text" id="name" name="name" required minlength="2" maxlength="100"
+                        class="w-full p-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-2" for="phone">Phone</label>
+                    <input type="text" id="phone" name="phone" required minlength="10" maxlength="20"
+                        class="w-full p-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-2" for="address">Address</label>
+                    <input type="text" id="address" name="address" required minlength="2" maxlength="100"
+                        class="w-full p-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all">
+                </div>
+            </div>
+            <div class="space-y-5">
+                <div class="flex justify-between tems-center">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4"> Packages </h2>
+                    <button type="button" onclick="addPackage()" class="px-4 py-2 text-sm font-medium text-orange-500 border border-orange-300 rounded-xl hover:border-orange-400 hover:bg-orange-100">
+                        Add another package
+                    </button>
+                </div>
+                <div id="packages" class="space-y-4"> </div>
+            </div>
+            <button type="submit" class="w-full bg-orange-500 text-white font-semibold py-3 px-3 rounded-xl hover:bg-orange-600 active:scale-[0.99] transition-all shadow-lg ">
+                Place order
+            </button>
+        </form>
+    </div>
+</div>
+
+<template id="packageTemplate">
+    <div class="package-item border border-gray-300 rounded-2xl p-5 bg-gray-50/50">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">Package #<span class="package-number"></span></h3>
+            <button type="button" onclick="removePackage(this)" class="text-red-500 hover:text-red-700 font-medium text-sm transition-colors">
+                Remove
+            </button>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-2" for="package-description">Size</label>
+                <select name="size" required class="w-full appearance-none p-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all bg-white">
+                    {{range $.OrderSize}}
+                    <option value="{{.}}">{{.}} </option>
+                    {{end}}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-2" for="package-description">Type</label>
+                <select name="order" required class="w-full appearance-none p-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all bg-white">
+                    {{range $.OrderType}}
+                    <option value="{{.}}">{{.}}</option>
+                    {{end}}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-2" for="package-description">Instructions</label>
+                <textarea name="instructions" rows="2" maxlength="200" class="w-full p-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"></textarea>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    let packageCount = 0;
+
+    function addPackage() {
+        const clone = document.getElementById('packageTemplate').content.cloneNode(true);
+        clone.querySelector(".package-number").textContent = ++packageCount;
+        document.getElementById('packages').appendChild(clone);
+    }
+
+    function removePackage(btn) {
+        btn.closest('.package-item').remove();
+        document.querySelectorAll('.package-item').forEach((item, index) => {
+            item.querySelector('.package-number').textContent = index + 1;
+        });
+        packageCount = document.querySelectorAll('.package-item').length;
+    }
+
+    addPackage();
+</script>
+{{template "bottom" .}}
