@@ -5,12 +5,12 @@ import (
 	"slices"
 
 	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 )
 
 func RegisterCustomValidators() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("valid_order_type", createSliceValidator(models.OrderStatuses))
+		v.RegisterValidation("valid_order_type", createSliceValidator(models.OrderTypes))
 		v.RegisterValidation("valid_order_size", createSliceValidator(models.OrderSizes))
 	}
 }

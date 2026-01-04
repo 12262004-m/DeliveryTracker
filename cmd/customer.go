@@ -9,23 +9,23 @@ import (
 )
 
 type OrderFormData struct {
-	OrderTypes []string
-	OrderSize  []string
+	OrderType []string
+	OrderSize []string
 }
 
 type OrderRequest struct {
-	Name         string   `form:"name" binding:"required, min=2, max=100"`
-	Phone        string   `form:"phone" binding:"required, min=2, max=20"`
-	Address      string   `form:"address" binding:"required, min=2, max=200"`
-	OrderSizes   []string `form:"size" binding:"required, min=1, dive,valid_order_size"`
-	OrderTypes   []string `form:"order" binding:"required, min=1, dive,valid_order_type"`
+	Name         string   `form:"name" binding:"required,min=2,max=100"`
+	Phone        string   `form:"phone" binding:"required,min=2,max=20"`
+	Address      string   `form:"address" binding:"required,min=2,max=200"`
+	OrderSizes   []string `form:"size" binding:"required,min=1,dive,valid_order_size"`
+	OrderTypes   []string `form:"order" binding:"required,min=1,dive,valid_order_type"`
 	Instructions []string `form:"instructions" binding:"max=300"`
 }
 
 func (h *Handler) ServeNewOrderForm(c *gin.Context) {
 	c.HTML(http.StatusOK, "order.tmpl", OrderFormData{
-		OrderTypes: models.OrderTypes,
-		OrderSize:  models.OrderSizes,
+		OrderType: models.OrderTypes,
+		OrderSize: models.OrderSizes,
 	})
 }
 
