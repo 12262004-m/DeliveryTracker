@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	OrderStatuses = []string{"Order placed", "Order confirmed", "Order shipped", "Order delivered", "Order cancelled"}
+	OrderStatuses = []string{"Created", "Confirmed", "Shipped", "Arrived", "Delivered"}
 	OrderSizes    = []string{"Small", "Medium", "Large", "Extra Large"}
 	OrderTypes    = []string{"Standard", "Express", "Overnight"}
 )

@@ -1,0 +1,104 @@
+{{template "top" .}}
+<title>{{.Title}}</title>
+<style>
+    @keyframes spin-slow {
+        to { transform: rotate(360deg); }
+    }
+    .spin-slow {
+        animation: spin-slow 5s linear infinite;
+    }
+</style>
+</head>
+<body class="bg-gray-200 min-h-screen">
+<div class="flex flex-col items-center p-6 md:p-8">
+    <div class="relative w-28 h-28 mb-10 drop-shadow-lg">
+        <img src="/static/package.svg" alt="Package" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10">
+        <img src="/static/arrow.svg" alt="Arrow" class="absolute inset-0 w-full h-full spin-slow">
+    </div>
+    <div id="statusContainer" class="bg-white/80 backdrop-blur-sm p-8 md:p-10 rounded-3xl shadow-xl border border-white max-w-2xl w-full">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4 text-center tracking-light">
+            Track your order
+        </h1> 
+        <div class="text-xl font-semibold text-gray-500 mb-8 text-center">
+            Order #{{.Order.ID}}
+        </div>
+        <div class="relative flex justify-between items-center mb-4">
+            <div id="progressLine" class="absolute inset-x-[30px] h-1.5 bg-gray-200 top-1/2 -translate-y-1/2 rounded-full"></div>
+            {{range $index, $ := .Statuses}}
+            <div class="flex-1 flex justify-center relative mx-2">
+                <div id="step{{add $index 1}}" class="size-12 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold transition-all duration-300 z-10 shadow-lg">
+                    {{add $index 1}}
+                </div>
+            </div>
+            {{end}}
+        </div>
+        <div class="flex justify-between text-sm  text-gray-800 mb-10 font-semibold">
+            {{range .Statuses}}
+            <span class="flex-1 text-center mx-2">{{.}}</span>
+            {{end}}
+        </div>
+        <div class="border border-gray-300 rounded-2xl p-5 bg-gray-50/50 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Order Details</h2>
+            <div class="grid grid-cols-3 gap-5">
+                <div>
+                    <p class="text-gray-500 mb-1 text-sm">Customer Name</p>
+                    <p class="text-gray-800 font-semibold">{{.Order.CustomerName}}</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 mb-1 text-sm">Phone</p>
+                    <p class="text-gray-800 font-semibold">{{.Order.Phone}}</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 mb-1 text-sm">Address</p>
+                    <p class="text-gray-800 font-semibold">{{.Order.Address}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="border border-gray-300 rounded-2xl p-5 bg-gray-50/50 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Packages</h2>
+            <div class="space-y-4">
+                {{range $index, $package := .Order.Items}}
+                <div class="border border-gray-300 rounded-2xl p-5 bg-white/80">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                        Package #{{add $index 1}}
+                    </h3>
+                    <div class="grid grid-cols-3 gap-5">
+                        <div>
+                            <p class="text-gray-500 mb-1 text-sm">Type</p>
+                            <p class="text-gray-800 font-semibold">{{$package.Package}}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 mb-1 text-sm">Size</p>
+                            <p class="text-gray-800 font-semibold">{{$package.Size}}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 mb-1 text-sm">Instructions</p>
+                            <p class="text-gray-800 font-semibold">{{if $package.Instructions}}{{$package.Instructions}}{{else}}None{{end}}</p>
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const statuses = {{json .Statuses}};
+
+    function updateStatusLine(currentStatus) {
+        const currentIndex = statuses.indexOf(currentStatus);
+        statuses.forEach((status, index) => {
+            const step = document.getElementById(`step${index + 1}`);
+            if (index <= currentIndex) {
+                step.classList.remove('bg-gray-300');
+                step.classList.add('bg-orange-500');
+            }
+        });
+        const progressLine = document.getElementById("progressLine");
+        const progressPercent = Math.max(currentIndex / (statuses.length - 1) * 100, 5);
+        progressLine.style.background = `linear-gradient(to right, #EA580C 0%, #F59E0B ${progressPercent}%, #E5E7EB ${progressPercent}%)`;
+    }
+    updateStatusLine("{{.Order.Status}}");
+
+</script>
+{{template "bottom" .}}
