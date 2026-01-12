@@ -5,18 +5,23 @@ import (
 	"html/template"
 	"os"
 
+	"github.com/gin-contrib/sessions"
+	gormsessions "github.com/gin-contrib/sessions/gorm"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type Config struct {
-	Port string
-	DB   string
+	Port             string
+	DB               string
+	SessionSecretKey string
 }
 
 func loadConfig() Config {
 	return Config{
-		Port: getEnv("PORT", "8080"),
-		DB:   getEnv("DB_URL", "./data/order.db"),
+		Port:             getEnv("PORT", "8080"),
+		DB:               getEnv("DB_URL", "./data/order.db"),
+		SessionSecretKey: getEnv("SESSION_SECRET_KEY", "package-order-secret-key"),
 	}
 }
 
@@ -43,4 +48,39 @@ func loadTemplates(router *gin.Engine) error {
 
 	router.SetHTMLTemplate(tmpl)
 	return nil
+}
+
+func setupSessionStore(db *gorm.DB, secretKey []byte) sessions.Store {
+	store := gormsessions.NewStore(db, true, secretKey)
+	store.Options(sessions.Options{
+		Path:     "/",
+		MaxAge:   86400,
+		HttpOnly: true,
+		Secure:   false,
+		SameSite: 3,
+	})
+	return store
+}
+
+func SetSessionValue(c *gin.Context, key string, value interface{}) error {
+	session := sessions.Default(c)
+	session.Set(key, value)
+	return session.Save()
+}
+
+func GetSessionString(c *gin.Context, key string) string {
+	session := sessions.Default(c)
+	val := session.Get(key)
+	if val == nil {
+		return ""
+	}
+
+	str, _ := val.(string)
+	return str
+}
+
+func ClearSession(c *gin.Context) error {
+	session := sessions.Default(c)
+	session.Clear()
+	return session.Save()
 }
